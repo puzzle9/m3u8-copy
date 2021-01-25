@@ -1,0 +1,12 @@
+M3u8List
+	id
+	url
+	status
+
+M3u8Hls
+	id
+	m3u8_list_id
+	duration
+	url
+	path
+	status

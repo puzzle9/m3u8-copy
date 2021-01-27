@@ -1,4 +1,5 @@
 """A GetM3u8InfoJob Queue Job."""
+import time
 
 from masonite.queues import Queueable
 
@@ -6,6 +7,7 @@ from app.Models.M3u8List import M3u8List
 from app.Models.M3u8Hls import M3u8Hls
 
 import m3u8
+
 
 class GetM3u8InfoJob(Queueable):
     """A GetM3u8InfoJob Job."""
@@ -19,12 +21,11 @@ class GetM3u8InfoJob(Queueable):
     def handle(self):
         """Logic to handle the job."""
         list_id = self.list_id
-        print('收到 %d' % (list_id))
 
         info = M3u8List.getInfo(list_id)
         url = info.url
 
-        print(info.status)
+        print('收到 {} {}'.format(list_id, info.status))
 
         if info.status == M3u8List.STATUS_FINISHED:
             print('%d %s 已完成' % (list_id, url))
@@ -36,7 +37,12 @@ class GetM3u8InfoJob(Queueable):
 
         M3u8List.changeStatus(list_id, M3u8List.STATUS_EXECUTING)
 
-        play_lists = m3u8.load(url)
+        try:
+            play_lists = m3u8.load(url, timeout=3)
+        except:
+            M3u8List.changeStatus(list_id, M3u8List.STATUS_FINISHED)
+            print('%d %s 执行完成' % (list_id, url))
+            return
 
         for play_list in play_lists.segments:
             M3u8Hls.start(list_id, play_list.duration, play_list.absolute_uri, play_list.uri)

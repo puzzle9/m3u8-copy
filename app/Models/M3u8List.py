@@ -1,7 +1,6 @@
 """M3u8List Model."""
 
 from masoniteorm.models import Model
-from masoniteorm.scopes import scope
 
 
 class M3u8List(Model):
@@ -22,10 +21,9 @@ class M3u8List(Model):
         data = self.where('url', url).first()
 
         if data:
-            if data.status == self.STATUS_FINISHED or data.status == self.STATUS_CREATE:
-                data.update({
-                    "status": self.STATUS_CREATE,
-                })
+            data.update({
+                "status": self.STATUS_CREATE,
+            })
         else:
             from config.database import DB
             DB.begin_transaction()
@@ -37,24 +35,29 @@ class M3u8List(Model):
 
         info = self.where('url', url).first()
 
-        if data.status == self.STATUS_FINISHED or data.status == self.STATUS_CREATE:
-            self.createGetInfoJob(data.id)
+        list_id = info.id
+
+        self.createGetInfoJob(list_id)
+
+        info.path = self.getM3u8Path(list_id)
 
         return info
 
     @classmethod
-    def createGetInfoJob(self, list_id, wait="0 s"):
+    def createGetInfoJob(self, list_id):
         from app.jobs.GetM3u8InfoJob import GetM3u8InfoJob
         container().make('Queue').push(GetM3u8InfoJob(list_id), wait="3 seconds")
 
     @classmethod
-    def getInfo(self, id):
-        return self.find(id)
+    def getInfo(cls, id):
+        return cls.find(id)
 
     @classmethod
-    def changeStatus(self, id, status):
-        self.find(id).update({
+    def changeStatus(cls, id, status):
+        cls.find(id).update({
             'status': status,
         })
 
-    # def ChangeStatus(self, list_id, status):
+    @classmethod
+    def getM3u8Path(cls, live_id):
+        return '/hls/{}/play.m3u8'.format(live_id)

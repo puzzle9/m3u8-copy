@@ -2,8 +2,6 @@
 
 from masoniteorm.models import Model
 
-import time
-
 
 class M3u8Hls(Model):
     """M3u8Hls Model."""
@@ -20,25 +18,21 @@ class M3u8Hls(Model):
 
     @classmethod
     def start(self, list_id, duration, url, path):
-        data = {
-            'm3u8_list_id': list_id,
-            'duration': duration,
-            'url': url,
-            'path': path,
-        }
-
         from config.database import DB
 
         # todo: 批量插入可能存在问题
         DB.begin_transaction()
 
-        info = self.where(data).first()
+        info = self.where('m3u8_list_id', list_id).where('path', path).first()
         if not info:
             print('没有 %s' % path)
-            data.update({
+            info = self.create({
+                'm3u8_list_id': list_id,
+                'duration': duration,
+                'url': url,
+                'path': path,
                 'status': self.STATUS_DEFAULT,
             })
-            info = self.create(data)
 
             DB.commit()
 

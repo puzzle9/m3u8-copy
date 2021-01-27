@@ -11,6 +11,9 @@ from app.Models.M3u8List import M3u8List
 class IndexController(Controller):
     """IndexController Controller Class."""
 
+    def __init__(self):
+        pass
+
     def show(self, response: Response):
         time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         return response.json({

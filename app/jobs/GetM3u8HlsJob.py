@@ -19,7 +19,7 @@ class GetM3u8HlsJob(Queueable):
     def fetch(self, qiniu, url, key):
         bucket = qiniu.bucket()
         fetch, ret = bucket.fetch(url, qiniu.bucket_name, key)
-        print(ret)
+        print(fetch)
         if ret.status_code == 200:
             return True
         else:
@@ -32,8 +32,6 @@ class GetM3u8HlsJob(Queueable):
 
         hls_info = M3u8Hls.find(hls_id)
 
-        print(hls_info.url)
-
         if hls_info.status != M3u8Hls.STATUS_DEFAULT:
             print("hls {} 状态错误".format(hls_id))
             return
@@ -43,7 +41,6 @@ class GetM3u8HlsJob(Queueable):
         })
 
         key = '/hls/{}/{}.ts'.format(hls_info.m3u8_list_id, hls_id)
-        print(key)
 
         qiniu = container().make('Qiniu')
         bucket = qiniu.bucket()

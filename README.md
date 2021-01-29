@@ -27,7 +27,7 @@ stdout_logfile = /m3u8-copy/storage/logs/supervisord-web.log
 [program:m3u8-copy-queue]
 process_name = %(program_name)s
 directory = /m3u8-copy
-command = /m3u8-copy/bin/craft queue:work
+command = /m3u8-copy/bin/python -u /m3u8-copy/craft queue:work
 autostart = true
 autorestart = true
 redirect_stderr = true

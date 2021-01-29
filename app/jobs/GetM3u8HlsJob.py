@@ -40,7 +40,7 @@ class GetM3u8HlsJob(Queueable):
             "status": M3u8Hls.STATUS_LOADING
         })
 
-        key = '/hls/{}/{}.ts'.format(hls_info.m3u8_list_id, hls_id)
+        key = 'hls/{}/{}.ts'.format(hls_info.m3u8_list_id, hls_id)
 
         qiniu = container().make('Qiniu')
         bucket = qiniu.bucket()

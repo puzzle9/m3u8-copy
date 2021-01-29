@@ -65,7 +65,7 @@ class IndexController(Controller):
 
         for info in infos:
             datas.append({
-                "name": "{}{}".format(domain, info.key),
+                "name": "{}/{}".format(domain, info.key),
                 "duration": info.duration
             })
 

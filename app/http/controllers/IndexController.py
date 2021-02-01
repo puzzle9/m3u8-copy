@@ -27,7 +27,7 @@ class IndexController(Controller):
             'time': time
         })
 
-    def create(self, request: Request):
+    def create(self, request: Request, response: Response):
         errors = request.validate({
             'm3u8_url': 'required'
         })
@@ -47,12 +47,12 @@ class IndexController(Controller):
             "list_id": info_id,
         }))
 
-        return {
+        return response.json({
             'id': info_id,
             'status': info.status,
             'path': info.path,
             'play_url': play_url,
-        }
+        })
 
     def play(self, request: Request, qiniu: Qiniu):
         list_id = request.param('list_id')

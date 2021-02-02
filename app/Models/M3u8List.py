@@ -42,7 +42,11 @@ class M3u8List(Model):
             info.update({
                 "status": self.STATUS_LOADING,
             })
-            self.createGetInfoJob(list_id, "5 seconds")
+
+            from masonite import env
+            wait = "{} seconds".format(env('GET_M3U8_LOADING_SECONDS', 3))
+
+            self.createGetInfoJob(list_id, wait)
 
         info.path = self.getM3u8Path(list_id)
 

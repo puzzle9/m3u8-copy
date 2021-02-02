@@ -39,7 +39,8 @@ class GetM3u8InfoJob(Queueable):
 
         try:
             play_lists = m3u8.load(url, timeout=3)
-        except:
+        except Exception as e:
+            print(e)
             M3u8List.changeStatus(list_id, M3u8List.STATUS_FINISHED)
             print('%d %s 执行完成' % (list_id, url))
             return

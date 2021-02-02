@@ -43,7 +43,6 @@ class GetM3u8HlsJob(Queueable):
         key = 'hls/{}/{}.ts'.format(hls_info.m3u8_list_id, hls_id)
 
         qiniu = container().make('Qiniu')
-        bucket = qiniu.bucket()
         try:
             fetch_status = self.fetch(qiniu, hls_info.url, key)
         except func_timeout.exceptions.FunctionTimedOut:

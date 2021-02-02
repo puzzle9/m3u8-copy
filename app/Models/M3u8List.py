@@ -21,9 +21,10 @@ class M3u8List(Model):
         data = self.where('url', url).first()
 
         if data:
-            data.update({
-                "status": self.STATUS_CREATE,
-            })
+            if data.status == self.STATUS_FINISHED:
+                data.update({
+                    "status": self.STATUS_CREATE,
+                })
         else:
             from config.database import DB
             DB.begin_transaction()
@@ -37,16 +38,20 @@ class M3u8List(Model):
 
         list_id = info.id
 
-        self.createGetInfoJob(list_id)
+        if info.status == self.STATUS_CREATE:
+            info.update({
+                "status": self.STATUS_LOADING,
+            })
+            self.createGetInfoJob(list_id, "5 seconds")
 
         info.path = self.getM3u8Path(list_id)
 
         return info
 
     @classmethod
-    def createGetInfoJob(self, list_id):
+    def createGetInfoJob(self, list_id, wait="3 seconds"):
         from app.jobs.GetM3u8InfoJob import GetM3u8InfoJob
-        container().make('Queue').push(GetM3u8InfoJob(list_id), wait="3 seconds")
+        container().make('Queue').push(GetM3u8InfoJob(list_id), wait=wait)
 
     @classmethod
     def getInfo(cls, id):
